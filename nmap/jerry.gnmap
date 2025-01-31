@@ -1,0 +1,4 @@
+# Nmap 7.95 scan initiated Thu Jan 30 22:26:54 2025 as: nmap -Pn -sC -sV -oA nmap/jerry 10.10.10.95
+Host: 10.10.10.95 ()	Status: Up
+Host: 10.10.10.95 ()	Ports: 8080/open/tcp//http//Apache Tomcat|Coyote JSP engine 1.1/	Ignored State: filtered (999)
+# Nmap done at Thu Jan 30 22:27:57 2025 -- 1 IP address (1 host up) scanned in 62.85 seconds
